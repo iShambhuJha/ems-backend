@@ -1,7 +1,10 @@
 const express = require("express");
 const mySql = require("mysql");
-const bcrypt = require("bcrypt")
+const bcrypt = require("bcrypt");
+var cors = require("cors")
+const {generateAccessToken, generateRefreshToken} = require('./generateAccessToken.js');
 require("dotenv").config();
+
 
 //middleware to read req.body.<params>
 
@@ -23,6 +26,7 @@ mySqlConnection.getConnection(function(err) {
     console.log("Connected!");
   });
 const app = express();
+app.use(cors()); // enable CORS to allow requests from frontend
 app.use(express.json());
 app.listen(3000,() => console.log("Server listening at port 3000"));
 
@@ -85,7 +89,10 @@ app.post("/login", (req, res)=> {
          //get the hashedPassword from result
         if (await bcrypt.compare(password, hashedPassword)) {
         console.log("---------> Login Successful")
-        res.send(`${empCode} is logged in!`)
+        console.log("---------> Generating accessToken")
+        const accessToken = generateAccessToken ({user: req.body.empCode})
+        const refreshToken = generateRefreshToken ({user: req.body.empCode})
+        res.json({accessToken: accessToken, refreshToken: refreshToken})
         } 
         else {
         console.log("---------> Password Incorrect")
