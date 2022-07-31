@@ -60,7 +60,7 @@ app.post("/createUser", async (req,res) => {
        if (err) throw (err)
        console.log ("--------> Created new User")
        console.log(result.insertId)
-       res.sendStatus(201)
+       res.json({message: 'User created sucessfully.', status: 'success'})
       })
      }
     }) //end of connection.query()
